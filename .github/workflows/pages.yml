@@ -23,7 +23,7 @@ jobs:
       - name: Stage the web build only
         run: |
           mkdir -p _site
-          cp -R index.html Build TemplateData .nojekyll _site/
+          cp -R index.html og-image.png Build TemplateData .nojekyll _site/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
