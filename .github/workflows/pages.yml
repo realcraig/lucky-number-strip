@@ -24,6 +24,8 @@ jobs:
         run: |
           mkdir -p _site
           cp -R index.html og-image.png Build TemplateData .nojekyll _site/
+          cat BuildParts/export.data.unityweb.* > _site/Build/export.data.unityweb
+          (cd _site && sha256sum --check ../BuildParts/SHA256SUMS)
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site

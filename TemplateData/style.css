@@ -1,16 +1,32 @@
-body { padding: 0; margin: 0 }
-#unity-container { position: absolute }
-#unity-container.unity-desktop { left: 50%; top: 50%; transform: translate(-50%, -50%) }
-#unity-container.unity-mobile { position: fixed; width: 100%; height: 100% }
-#unity-canvas { background: #231F20 }
-.unity-mobile #unity-canvas { width: 100%; height: 100% }
-#unity-loading-bar { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: none }
-#unity-logo { width: 154px; height: 130px; background: url('unity-logo-dark.png') no-repeat center }
-#unity-progress-bar-empty { width: 141px; height: 18px; margin-top: 10px; margin-left: 6.5px; background: url('progress-bar-empty-dark.png') no-repeat center }
-#unity-progress-bar-full { width: 0%; height: 18px; margin-top: 10px; background: url('progress-bar-full-dark.png') no-repeat center }
-#unity-footer { position: relative }
-.unity-mobile #unity-footer { display: none }
-#unity-logo-title-footer { float:left; width: 102px; height: 38px; background: url('unity-logo-title-footer.png') no-repeat center }
-#unity-build-title { float: right; margin-right: 10px; line-height: 38px; font-family: arial; font-size: 18px }
-#unity-fullscreen-button { cursor:pointer; float: right; width: 38px; height: 38px; background: url('fullscreen-button.png') no-repeat center }
-#unity-warning { position: absolute; left: 50%; top: 5%; transform: translate(-50%); background: white; padding: 10px; display: none }
+html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #0b0820 }
+#unity-container { position: fixed; inset: 0 }
+#unity-canvas { width: 100%; height: 100%; display: block; background: #231F20 }
+
+#slotgun-loader { position: absolute; inset: 0; display: flex; align-items: center; justify-content: flex-start; padding-left: 6vw; overflow: hidden; background: #0b0820; transition: opacity 0.5s ease; font-family: Impact, 'Arial Black', sans-serif }
+#slotgun-loader.done { opacity: 0; pointer-events: none }
+/* The title screen's own backdrop, held still, shaded on the left where the logo sits like the menu column. */
+#slotgun-backdrop { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(8, 5, 24, 0.9) 0%, rgba(8, 5, 24, 0.7) 32%, rgba(8, 5, 24, 0.15) 62%, rgba(8, 5, 24, 0) 75%), linear-gradient(0deg, rgba(8, 5, 24, 0.75) 0%, rgba(8, 5, 24, 0) 30%), url('menu-backdrop.jpg') center / cover }
+#slotgun-card { position: relative; width: min(46vw, 640px) }
+#slotgun-logo { display: block; width: 100%; filter: drop-shadow(0 8px 0 #000) drop-shadow(0 0 28px rgba(255, 209, 64, 0.45)); animation: slotgun-pulse 2.8s ease-in-out infinite }
+#slotgun-bar { position: relative; height: 30px; margin: 26px 4% 0; border: 4px solid #000; border-radius: 6px; background: #1d1440; box-shadow: 0 6px 0 #000, 0 0 24px rgba(47, 227, 255, 0.35); overflow: hidden }
+#slotgun-fill { width: 0%; height: 100%; background: repeating-linear-gradient(-45deg, #ffd140 0 16px, #ffb300 16px 32px); box-shadow: inset 0 -6px 0 rgba(0, 0, 0, 0.25); transition: width 0.2s ease-out; animation: slotgun-stripes 0.6s linear infinite }
+#slotgun-bulbs { position: absolute; inset: 0; background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 3px, transparent 4px) 0 50% / 22px 22px repeat-x; mix-blend-mode: overlay; animation: slotgun-chase 0.5s steps(2) infinite }
+#slotgun-status { display: flex; justify-content: space-between; margin: 14px 4% 0; color: #fff; font-size: clamp(16px, 2.4vw, 24px); letter-spacing: 0.06em; text-transform: uppercase; text-shadow: 3px 3px 0 #000, -1px -1px 0 #000 }
+#slotgun-percent { color: #ffd140 }
+
+#unity-fullscreen-button { position: absolute; right: 12px; bottom: 12px; width: 38px; height: 38px; cursor: pointer; background: url('fullscreen-button.png') no-repeat center; opacity: 0.6 }
+#unity-fullscreen-button:hover { opacity: 1 }
+.mobile #unity-fullscreen-button { display: none }
+#unity-build-title { position: absolute; left: 12px; bottom: 12px }
+#unity-warning { position: absolute; left: 50%; top: 5%; transform: translate(-50%); color: #fff; font-family: sans-serif; display: none }
+
+/* Portrait and narrow screens: the column becomes a centred stack over a fuller shade. */
+@media (max-aspect-ratio: 1/1), (max-width: 700px) {
+  #slotgun-loader { justify-content: center; padding-left: 0 }
+  #slotgun-backdrop { background: linear-gradient(180deg, rgba(8, 5, 24, 0.35), rgba(8, 5, 24, 0.85)), url('menu-backdrop.jpg') center / cover }
+  #slotgun-card { width: min(86vw, 640px) }
+}
+
+@keyframes slotgun-pulse { 0%, 100% { transform: scale(1) rotate(-1deg) } 50% { transform: scale(1.02) rotate(1deg) } }
+@keyframes slotgun-stripes { to { background-position: 45px 0 } }
+@keyframes slotgun-chase { to { background-position: 11px 50% } }
