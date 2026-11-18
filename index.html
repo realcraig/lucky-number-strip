@@ -63,6 +63,38 @@
         updateBannerVisibility();
       }
 
+      // Raw mouse movement for the look where the browser offers it (Chrome, Edge): without it macOS's pointer
+      // acceleration shapes every turn, most of all on a trackpad. Safari and Firefox ignore the option and lock as
+      // before; a browser that rejects it (NotSupportedError) gets the plain lock, now and from then on. Unity ignores
+      // what the request returns, so a refusal is not left as an unhandled rejection: pointerlockerror reports it.
+      var rawMouse = true, plainRetry = null;
+      var requestLock = Element.prototype.requestPointerLock;
+      if (requestLock) {
+        Element.prototype.requestPointerLock = function(options) {
+          var element = this;
+          if (!rawMouse) return requestLock.call(element, options);
+          var result = requestLock.call(element, Object.assign({ unadjustedMovement: true }, options));
+          if (!result || !result.catch) return result;
+          return result.catch(function(error) {
+            if (!error || error.name !== "NotSupportedError") return;
+            rawMouse = false;
+            plainRetry = Promise.resolve(requestLock.call(element, options)).catch(function() {});
+            return plainRetry.then(function() { plainRetry = null; });
+          });
+        };
+      }
+
+      // Chrome refuses pointer lock for about a second after Esc and says so only with pointerlockerror, which Unity
+      // doesn't listen for: announce it as a change so Unity reads the real (unlocked) state. Checked a task later, so
+      // a raw request falling back to the plain lock above is not taken for a refusal.
+      document.addEventListener("pointerlockerror", function() {
+        setTimeout(function() {
+          if (!document.pointerLockElement && !plainRetry) {
+            document.dispatchEvent(new Event("pointerlockchange"));
+          }
+        }, 0);
+      });
+
       var buildUrl = "Build";
       var loaderUrl = buildUrl + "/export.loader.js";
       var config = {
@@ -102,6 +134,7 @@
           document.querySelector("#slotgun-fill").style.width = percent + "%";
           document.querySelector("#slotgun-percent").textContent = percent + "%";
         }).then((unityInstance) => {
+          window.unityInstance = unityInstance;   // for the page console and WebBenchmark's SendMessage hooks
           clearInterval(lineTimer);
           var loader = document.querySelector("#slotgun-loader");
           loader.classList.add("done");
